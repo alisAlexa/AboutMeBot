@@ -1,4 +1,4 @@
-package org.pack.telegram;
+package org.pack.telegram.enums;
 
 public enum MenuButton {
     WORK_EXPERIENCE,
