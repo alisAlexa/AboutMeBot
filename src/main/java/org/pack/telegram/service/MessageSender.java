@@ -33,7 +33,6 @@ public class MessageSender {
 
         try {
             bot.execute(deleteMessage);
-            log.debug("Message with id {} deleted.", messageId);
         } catch (TelegramApiException exception) {
             log.error("Error delete message with messageId: {}, text error: {}", messageId, exception.getMessage());
         }
