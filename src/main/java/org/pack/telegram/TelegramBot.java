@@ -25,7 +25,6 @@ import static org.pack.telegram.MenuButton.*;
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
 
-    // Словарь для хранения последнего идентификатора сообщения для каждого чата
     private final Map<String, Integer> lastMessageIds = new HashMap<>();
     private final BotConfig botConfig;
     private final MessageSender sender;
@@ -45,12 +44,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasCallbackQuery()) {
             String callbackData = update.getCallbackQuery().getData();
             String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
-            int messageId = update.getCallbackQuery().getMessage().getMessageId();  // Получение ID сообщения
+            int messageId = update.getCallbackQuery().getMessage().getMessageId();
 
 
             if (callbackData.equals(String.valueOf(WORK_EXPERIENCE))) {
 
-                sender.deleteMessage(chatId, messageId);//Удаляем последнее сообщение
+                sender.deleteMessage(chatId, messageId);
 
                 SendMessage responseMessage = new SendMessage();
                 responseMessage.setChatId(String.valueOf(chatId));
@@ -59,7 +58,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 sender.sendMessage(responseMessage);
             } else if (callbackData.equals(String.valueOf(TECHNICAL_SKILLS))) {
-                sender.deleteMessage(chatId, messageId);//Удаляем последнее сообщение
+                sender.deleteMessage(chatId, messageId);
 
                 SendMessage responseMessage = new SendMessage();
                 responseMessage.setChatId(String.valueOf(chatId));
@@ -68,7 +67,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 sender.sendMessage(responseMessage);
             } else if (callbackData.equals(String.valueOf(MENU_BUTTON))) {
-                sender.deleteMessage(chatId, messageId);//Удаляем последнее сообщение
+                sender.deleteMessage(chatId, messageId);
 
                 mainMenu(chatId);
             }
@@ -113,7 +112,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      * Метод собирает клавиатуру для главного меню
      * @return markup
      */
-    private static InlineKeyboardMarkup getInlineKeyboardMarkup() {//меню в сообщении
+    private static InlineKeyboardMarkup getInlineKeyboardMarkup() {
         InlineKeyboardMarkup markup  = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
@@ -153,56 +152,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return botConfig.getTokenBot();
-    }
-
-    public void sendReplyKeyboard(String chatId) {//Интерактивное меню
-/*
-        String receivedText = update.getMessage().getText();
-        switch (Objects.requireNonNull(receivedText)) {
-            case "МЕНЮ":
-                // Пользователь нажал на "Option 1"
-                // ... выполните действие для "Option 1" ...
-                for (Map.Entry<String, Integer> entry : lastMessageIds.entrySet()) {
-                    deleteMessage(entry.getKey(), entry.getValue());
-                }
-                sendTextMessage(chatId, "Вы выбрали A!");
-                break;
-            case "Задать вопрос":
-                sendTextMessage(chatId, "Вы выбрали B!");
-
-                InlineKeyboardMarkup markup = getInlineKeyboardMarkup();
-
-                SendMessage message = new SendMessage();
-                message.setChatId(chatId);
-                message.setText("Here are your options: ");
-                message.setReplyMarkup(markup);
-
-                sendMessage(message);
-                break;
-        }*/
-
-        sendReplyKeyboard(chatId);
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        //Создание рядов кнопок
-        KeyboardRow rowA = new KeyboardRow();
-        rowA.add("МЕНЮ");
-        keyboard.add(rowA);
-
-        KeyboardRow rowB = new KeyboardRow();
-        rowB.add("ЗАДАТЬ ВОПРОС");
-        rowB.add("ПОМОЩЬ");
-        keyboard.add(rowB);
-
-        keyboardMarkup.setKeyboard(keyboard);
-
-        SendMessage message  = new SendMessage();
-        message.setChatId(chatId);
-        message.setReplyMarkup(keyboardMarkup);
-
-        sender.sendMessageAndSaveIDMessage(lastMessageIds, message);
     }
 
 }
