@@ -1,27 +1,30 @@
 package org.pack.telegram.entity;
 
+
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Setter
-@Entity(name = "users")
-public class User {
+@Entity(name = "meetings")
+public class Meeting {
 
     @Id
     @NotNull
-    private Long userId;
+    private Long meetingId;
 
-    private String firstName;
+    private Long userId;
 
     private String userName;
 
-    private Timestamp registeredAt;
+    private Date dateAndTime;
 
-    private String phoneNumber;
+    private String link;
+
+    private String note;
 }
