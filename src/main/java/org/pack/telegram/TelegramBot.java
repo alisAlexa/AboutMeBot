@@ -13,15 +13,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.pack.telegram.enums.MenuButton.*;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
+
     private final BotConfig botConfig;
     private final MessageSender sender;
 
@@ -29,6 +28,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public TelegramBot(BotConfig botConfig, MessageSender sender) {
         this.botConfig = botConfig;
         this.sender = sender;
+        log.info("TelegramBot worked");
     }
     @Override
     public void onUpdateReceived(Update update) {
@@ -140,8 +140,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        log.info("Telegram bot with name: {}, worked!", botConfig.getNameBot());
-
         return botConfig.getNameBot();
     }
 

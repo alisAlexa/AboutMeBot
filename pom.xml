@@ -9,45 +9,74 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17.0.8</maven.compiler.source>
-        <maven.compiler.target>17.0.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.1.3</spring.version>
-        <lombok.version>1.18.30</lombok.version>
+        <spring-boot.version>2.6.1</spring-boot.version> <!-- Обновляем до актуальной версии Spring Boot -->
+        <spring-boot.jpa.version>3.1.3</spring-boot.jpa.version>
+        <lombok.version>1.18.12</lombok.version> <!-- Обновляем до актуальной версии Lombok -->
         <telegram.starter.version>5.7.0</telegram.starter.version>
     </properties>
 
-
     <dependencies>
-
-        <!--SPRING-->
+        <!-- SPRING BOOT STARTER -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-            <version>${spring.version}</version>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
-        <!--TELEGRAM-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.jpa.version}</version>
+        </dependency>
+
+        <!-- TELEGRAM BOT STARTER -->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-spring-boot-starter</artifactId>
             <version>${telegram.starter.version}</version>
+            <exclusions>
+                <!-- Исключаем зависимости логирования из Telegram Bot API -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!--LOGG-->
+        <!-- LOMBOK -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- SLF4J to Log4j2 bridge -->
+        <!-- POSTGRESQL JDBC DRIVER -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.20.0</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.26</version> <!-- Обновляем до актуальной версии PostgreSQL JDBC Driver -->
         </dependency>
 
-
+        <!-- SPRING BOOT STARTER DATA JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
     </dependencies>
+
 </project>
+        <!--
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
+    </build>-->
