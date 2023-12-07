@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -20,11 +20,16 @@ public class Meeting {
 
     private Long chatId;
 
-    private String userName;
+    private String dayOfWeek;
 
-    private Date dateAndTime;
+    private int dayOfMonth;
+
+    private LocalTime time;
 
     private String link;
 
     private String note;
+
+    private boolean isActual;
+
 }

@@ -1,7 +1,12 @@
 package org.pack.telegram;
 
 import org.pack.telegram.config.BotConfig;
+import org.pack.telegram.entity.Meeting;
+import org.pack.telegram.entity.User;
+import org.pack.telegram.service.MeetingService;
 import org.pack.telegram.service.MessageSender;
+import org.pack.telegram.service.UserService;
+import org.pack.telegram.service.sender.MeetingSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +30,22 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
     private final MessageSender sender;
+    private final MeetingSender meetingSender;
+
+    private final UserService userService;
+    private final MeetingService meetingService;
+
     @Autowired
-    public TelegramBot(BotConfig botConfig, MessageSender sender) {
+    public TelegramBot(BotConfig botConfig,
+                       MessageSender sender,
+                       MeetingSender meetingSender,
+                       UserService service,
+                       MeetingService meetingService) {
         this.botConfig = botConfig;
         this.sender = sender;
+        this.meetingSender = meetingSender;
+        this.userService = service;
+        this.meetingService = meetingService;
         log.info("TelegramBot worked motherfucker!!!");
     }
     @Override
@@ -43,6 +60,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
             int messageId = update.getCallbackQuery().getMessage().getMessageId();
 
+            User user = userService.checkUser(update.getCallbackQuery().getMessage().getChatId(),
+                                update.getCallbackQuery().getMessage().getChat());
 
             if (callbackData.equals(String.valueOf(WORK_EXPERIENCE))) {
                 sender.deleteMessage(chatId, messageId);
@@ -53,9 +72,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 sender.sendMessage(sender.fillTextMessage(chatId, "Мои технические навыки..."));
             } else if (isMeeting(callbackData)) {
-                sender.deleteMessage(chatId, messageId);
+                sender.deleteMessage(chatId, messageId);//"DATE_WEDNESDAY"
+                Meeting meeting = new Meeting();
+                //DATE_TUESDAY_5
+                if (callbackData.contains("DATE")) {
+                    meetingService.fillDayOfWeekAndMonth(meeting, user, callbackData);
+                }
 
-                sender.sendMessage(sender.fillMeetingMessage(chatId, callbackData));
+                sender.sendMessage(meetingSender.fillMeetingMessage(chatId, callbackData));
             } else if (callbackData.equals(String.valueOf(MENU))) {
                 sender.deleteMessage(chatId, messageId);
 

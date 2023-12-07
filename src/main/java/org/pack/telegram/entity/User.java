@@ -15,13 +15,14 @@ public class User {
 
     @Id
     @NotNull
-    private Long userId;
-
-    private String chatId;
+    private Long chatId;
 
     private String userName;
+
+    private String firstName;
 
     private Timestamp registeredAt;
 
     private String phoneNumber;
+
 }

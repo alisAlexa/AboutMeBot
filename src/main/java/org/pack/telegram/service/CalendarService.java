@@ -35,7 +35,7 @@ public class CalendarService {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(day.getDayOfWeek().toString() + " " + day.getDayOfMonth());//выдается как MONDAY 4
-            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString());
+            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString() + "_" + day.getDayOfMonth());
 
             rowInline.add(button);
             rowsInline.add(rowInline);
