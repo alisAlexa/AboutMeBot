@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.pack.telegram.enums.MenuButton.MENU;
+import static org.pack.telegram.enums.MenuButtonsEnum.MENU;
 
 @Component
 public class ButtonService {
@@ -51,7 +51,7 @@ public class ButtonService {
      * Метод отвечает за создание кнопок для меню
      * @param text - текст который будет выведен на кнопке
      * @param callbackData - для идентификации ботом нужных команд
-     * @return button
+     * @return InlineKeyboardButton
      */
     public static InlineKeyboardButton createButtonMenu(String text, String callbackData) {
         InlineKeyboardButton button = new InlineKeyboardButton();

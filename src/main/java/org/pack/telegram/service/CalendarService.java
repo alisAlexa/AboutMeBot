@@ -9,12 +9,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.pack.telegram.enums.MenuButton.*;
+import static org.pack.telegram.enums.MeetingEnum.*;
 import static org.pack.telegram.service.ButtonService.getBackButton;
 
 @Component
 public class CalendarService {
 
+    /**
+     * Этот метод создаёт и возвращает объект InlineKeyboardMarkup,
+     * который представляет собой календарь с инлайн-кнопками.
+     * Он принимает булевый параметр isNextWeek, который определяет,
+     * нужно ли показывать текущую или следующую неделю.
+     * @param isNextWeek
+     * @return InlineKeyboardMarkup с кнопками календаря.
+     */
     public static InlineKeyboardMarkup getCalendar(boolean isNextWeek) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
@@ -26,8 +34,8 @@ public class CalendarService {
         for (LocalDate day : weekdays) {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(day.getDayOfWeek().toString() + " " + day.getDayOfMonth());
-            button.setCallbackData(DATE.name()); // установка уникального идентификатора для каждой кнопки+ day.toString()
+            button.setText(day.getDayOfWeek().toString() + " " + day.getDayOfMonth());//выдается как MONDAY 4
+            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString());
 
             rowInline.add(button);
             rowsInline.add(rowInline);
@@ -43,7 +51,12 @@ public class CalendarService {
         return markup;
     }
 
-
+    /**
+     * Этот вспомогательный метод создаёт и возвращает
+     * список из двух InlineKeyboardButton: одна для перехода
+     * на предыдущую неделю, другая — на следующую.
+     * @return List<InlineKeyboardButton>
+     */
     private static List<InlineKeyboardButton> createWeekSwitchButtons() {
         List<InlineKeyboardButton> weekSwitchButtons = new ArrayList<>();
 
@@ -61,7 +74,12 @@ public class CalendarService {
         return weekSwitchButtons;
     }
 
-
+    /**
+     * Этот метод предоставляет функционал для получения списка будних дней
+     * (понедельник-пятница) для текущей или следующей недели.
+     * @param nextWeek - если false, то выдает текущую, если true следующую
+     * @return List<LocalDate> - будние дни
+     */
     public static List<LocalDate> getWeekdays(boolean nextWeek) {
         LocalDate start = LocalDate.now();
         if (nextWeek) {

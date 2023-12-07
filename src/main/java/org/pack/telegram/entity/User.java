@@ -17,7 +17,7 @@ public class User {
     @NotNull
     private Long userId;
 
-    private String firstName;
+    private String chatId;
 
     private String userName;
 

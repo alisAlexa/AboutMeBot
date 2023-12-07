@@ -1,7 +1,6 @@
 package org.pack.telegram;
 
 import org.pack.telegram.config.BotConfig;
-import org.pack.telegram.service.CalendarService;
 import org.pack.telegram.service.MessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +12,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.pack.telegram.enums.MenuButton.*;
-import static org.pack.telegram.service.ButtonService.*;
-import static org.pack.telegram.service.CalendarService.getCalendar;
-import static org.pack.telegram.service.CalendarService.getWeekdays;
+import static org.pack.telegram.enums.MeetingEnum.isMeeting;
+import static org.pack.telegram.enums.MenuButtonsEnum.*;
+import static org.pack.telegram.service.ButtonService.createButtonMenu;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
-
 
     private final BotConfig botConfig;
     private final MessageSender sender;
@@ -33,7 +29,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public TelegramBot(BotConfig botConfig, MessageSender sender) {
         this.botConfig = botConfig;
         this.sender = sender;
-        log.info("TelegramBot worked");
+        log.info("TelegramBot worked motherfucker!!!");
     }
     @Override
     public void onUpdateReceived(Update update) {
@@ -56,20 +52,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                 sender.deleteMessage(chatId, messageId);
 
                 sender.sendMessage(sender.fillTextMessage(chatId, "Мои технические навыки..."));
-            } else if (callbackData.equals(String.valueOf(MEETING)) ||
-                        callbackData.equals(String.valueOf(NEXT_WEEK)) ||
-                        callbackData.equals(String.valueOf(PREV_WEEK))) {
+            } else if (isMeeting(callbackData)) {
                 sender.deleteMessage(chatId, messageId);
-                SendMessage message = new SendMessage();
-                message.setChatId(chatId);
-                message.setText("Запись на встречу: ");
-                if (callbackData.equals(String.valueOf(MEETING)) ||
-                        callbackData.equals(String.valueOf(PREV_WEEK))) {
-                    message.setReplyMarkup(getCalendar(false));
-                } else {
-                    message.setReplyMarkup(getCalendar(true));
-                }
-                sender.sendMessage(message);
+
+                sender.sendMessage(sender.fillMeetingMessage(chatId, callbackData));
             } else if (callbackData.equals(String.valueOf(MENU))) {
                 sender.deleteMessage(chatId, messageId);
 

@@ -18,7 +18,7 @@ public class Meeting {
     @NotNull
     private Long meetingId;
 
-    private Long userId;
+    private Long chatId;
 
     private String userName;
 
