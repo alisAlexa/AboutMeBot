@@ -6,6 +6,12 @@ import org.pack.telegram.repository.MeetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static org.pack.telegram.util.StringExtractor.extractDayOfMonth;
 import static org.pack.telegram.util.StringExtractor.extractDayOfWeek;
 
@@ -24,5 +30,18 @@ public class MeetingService {
         meeting.setDayOfWeek(extractDayOfWeek(callbackData));
         meeting.setDayOfMonth(extractDayOfMonth(callbackData));
         meeting.setActual(false);//пока лишь заполняем так что не потверждено
+    }
+
+    public void fillTime(Meeting meeting, User user, String callbackData) {
+    }
+
+    public Set<String> getOccupiedTimeSlots(String dayOfWeek, int dayOfMonth) {
+        List<Meeting> meetings = repository.findByDayOfWeekAndDayOfMonth(dayOfWeek, dayOfMonth);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        return meetings.stream()
+                .map(Meeting::getTime)
+                .map(time -> time.format(formatter))
+                .collect(Collectors.toSet());
     }
 }

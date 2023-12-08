@@ -17,11 +17,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import static org.pack.telegram.enums.MeetingEnum.isMeeting;
+import static org.pack.telegram.enums.MeetingEnum.*;
 import static org.pack.telegram.enums.MenuButtonsEnum.*;
+import static org.pack.telegram.enums.MenuButtonsEnum.MEETING;
 import static org.pack.telegram.service.ButtonService.createButtonMenu;
 
 @Component
@@ -75,11 +78,20 @@ public class TelegramBot extends TelegramLongPollingBot {
                 sender.deleteMessage(chatId, messageId);//"DATE_WEDNESDAY"
                 Meeting meeting = new Meeting();
                 //DATE_TUESDAY_5
-                if (callbackData.contains("DATE")) {
-                    meetingService.fillDayOfWeekAndMonth(meeting, user, callbackData);
+                if (callbackData.contains(MEETING.name())) {
+                    meetingSender.fillMeetingButtons(chatId, callbackData);
+                } else if (callbackData.contains(DATE.name())) {
+                    meetingService.fillDayOfWeekAndMonth(meeting, user, callbackData); // заполняем meeting днем недели и датой
+
+                    Set<String> occupiedSlots =
+                            meetingService.getOccupiedTimeSlots(meeting.getDayOfWeek(), meeting.getDayOfMonth());
+
+                    meetingSender.fillTimeButtons(chatId, callbackData, occupiedSlots); // отправляем кнопки с выбором времени
+
+                } else if (callbackData.contains(TIME.name())) {
+                    meetingService.fillTime(meeting, user, callbackData); // заполняем meeting временем
                 }
 
-                sender.sendMessage(meetingSender.fillMeetingMessage(chatId, callbackData));
             } else if (callbackData.equals(String.valueOf(MENU))) {
                 sender.deleteMessage(chatId, messageId);
 
