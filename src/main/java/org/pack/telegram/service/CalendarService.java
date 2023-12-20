@@ -1,5 +1,7 @@
 package org.pack.telegram.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -14,6 +16,7 @@ import static org.pack.telegram.service.ButtonService.getBackButton;
 
 @Component
 public class CalendarService {
+    private static final Logger log = LoggerFactory.getLogger(CalendarService.class);
 
     /**
      * Этот метод создаёт и возвращает объект InlineKeyboardMarkup,
@@ -35,7 +38,7 @@ public class CalendarService {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(day.getDayOfWeek().toString() + " " + day.getDayOfMonth());//выдается как MONDAY 4
-            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString() + "_" + day.getDayOfMonth());
+            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString() + "_" + day.getDayOfMonth() + "_" + day.getMonth().toString());
 
             rowInline.add(button);
             rowsInline.add(rowInline);

@@ -26,6 +26,7 @@ import static org.pack.telegram.enums.MeetingEnum.*;
 import static org.pack.telegram.enums.MenuButtonsEnum.*;
 import static org.pack.telegram.enums.MenuButtonsEnum.MEETING;
 import static org.pack.telegram.service.ButtonService.createButtonMenu;
+import static org.pack.telegram.util.StringExtractor.createMeetingId;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -77,6 +78,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             } else if (isMeeting(callbackData)) {
                 sender.deleteMessage(chatId, messageId);//"DATE_WEDNESDAY"
                 Meeting meeting = new Meeting();
+                meeting.setMeetingId(createMeetingId(chatId));
                 //DATE_TUESDAY_5
                 if (callbackData.contains(MEETING.name())) {
                     meetingSender.fillMeetingButtons(chatId, callbackData);
@@ -88,8 +90,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                     meetingSender.fillTimeButtons(chatId, callbackData, occupiedSlots); // отправляем кнопки с выбором времени
 
-                } else if (callbackData.contains(TIME.name())) {
-                    meetingService.fillTime(meeting, user, callbackData); // заполняем meeting временем
+                } else if (callbackData.contains(TIME.name())) {//there
+                    meetingService.fillTime(user, callbackData); // заполняем meeting временем. после заполнения ничего не делаем!!!
+
+                    meetingSender.confirmationOfTheMeeting(user);//подтверждение встречи
+                } else if (callbackData.contains(APPROVE.name())) {
+                    meetingService.isActualMeeting(Long.valueOf(chatId), true);
+                    mainMenu(chatId);
                 }
 
             } else if (callbackData.equals(String.valueOf(MENU))) {

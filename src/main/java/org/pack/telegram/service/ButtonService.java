@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.pack.telegram.enums.MeetingEnum.DATE;
+import static org.pack.telegram.enums.MeetingEnum.MEETING;
 import static org.pack.telegram.enums.MenuButtonsEnum.MENU;
 
 @Component
@@ -41,6 +43,18 @@ public class ButtonService {
         InlineKeyboardButton backButton = new InlineKeyboardButton();
         backButton.setText("Вернуться в главное меню");
         backButton.setCallbackData(String.valueOf(MENU));
+
+        getBackMenu.add(backButton);
+
+        return getBackMenu;
+    }
+
+    public static List<InlineKeyboardButton> getBackToCalendarButton() {
+        List<InlineKeyboardButton> getBackMenu = new ArrayList<>();
+
+        InlineKeyboardButton backButton = new InlineKeyboardButton();
+        backButton.setText("Выбрать другую дату");
+        backButton.setCallbackData(String.valueOf(MEETING));
 
         getBackMenu.add(backButton);
 

@@ -24,6 +24,8 @@ public class Meeting {
 
     private int dayOfMonth;
 
+    private String month;
+
     private LocalTime time;
 
     private String link;
@@ -32,4 +34,7 @@ public class Meeting {
 
     private boolean isActual;
 
+    public String getMeeting() {
+        return " " + time + " " + dayOfMonth + " " + month + " (" + dayOfWeek + ") ";
+    }
 }
