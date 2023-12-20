@@ -1,7 +1,8 @@
 package org.pack.telegram.enums;
 
-public enum MenuButton {
+public enum MenuButtonsEnum {
     WORK_EXPERIENCE,
     TECHNICAL_SKILLS,
-    MENU_BUTTON
+    MENU,
+    MEETING
 }

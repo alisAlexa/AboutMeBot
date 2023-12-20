@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 @Getter
@@ -13,11 +14,15 @@ import java.sql.Timestamp;
 public class User {
 
     @Id
+    @NotNull
     private Long chatId;
-
-    private String firstName;
 
     private String userName;
 
+    private String firstName;
+
     private Timestamp registeredAt;
+
+    private String phoneNumber;
+
 }

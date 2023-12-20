@@ -1,7 +1,12 @@
 package org.pack.telegram;
 
 import org.pack.telegram.config.BotConfig;
+import org.pack.telegram.entity.Meeting;
+import org.pack.telegram.entity.User;
+import org.pack.telegram.service.MeetingService;
 import org.pack.telegram.service.MessageSender;
+import org.pack.telegram.service.UserService;
+import org.pack.telegram.service.sender.MeetingSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +17,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import static org.pack.telegram.enums.MenuButton.*;
+import static org.pack.telegram.enums.MeetingEnum.*;
+import static org.pack.telegram.enums.MenuButtonsEnum.*;
+import static org.pack.telegram.enums.MenuButtonsEnum.MEETING;
+import static org.pack.telegram.service.ButtonService.createButtonMenu;
+import static org.pack.telegram.util.StringExtractor.createMeetingId;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -23,12 +34,23 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
     private final MessageSender sender;
+    private final MeetingSender meetingSender;
+
+    private final UserService userService;
+    private final MeetingService meetingService;
 
     @Autowired
-    public TelegramBot(BotConfig botConfig, MessageSender sender) {
+    public TelegramBot(BotConfig botConfig,
+                       MessageSender sender,
+                       MeetingSender meetingSender,
+                       UserService service,
+                       MeetingService meetingService) {
         this.botConfig = botConfig;
         this.sender = sender;
-        log.info("TelegramBot worked");
+        this.meetingSender = meetingSender;
+        this.userService = service;
+        this.meetingService = meetingService;
+        log.info("TelegramBot worked motherfucker!!!");
     }
     @Override
     public void onUpdateReceived(Update update) {
@@ -42,27 +64,42 @@ public class TelegramBot extends TelegramLongPollingBot {
             String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
             int messageId = update.getCallbackQuery().getMessage().getMessageId();
 
+            User user = userService.checkUser(update.getCallbackQuery().getMessage().getChatId(),
+                                update.getCallbackQuery().getMessage().getChat());
 
             if (callbackData.equals(String.valueOf(WORK_EXPERIENCE))) {
-
                 sender.deleteMessage(chatId, messageId);
 
-                SendMessage responseMessage = new SendMessage();
-                responseMessage.setChatId(String.valueOf(chatId));
-                responseMessage.setText("Мой опыт работы включает в себя...");
-                responseMessage.setReplyMarkup(backButton());
-
-                sender.sendMessage(responseMessage);
+                sender.sendMessage(sender.fillTextMessage(chatId, "Мой опыт работы включает в себя..."));
             } else if (callbackData.equals(String.valueOf(TECHNICAL_SKILLS))) {
                 sender.deleteMessage(chatId, messageId);
 
-                SendMessage responseMessage = new SendMessage();
-                responseMessage.setChatId(String.valueOf(chatId));
-                responseMessage.setText("Мои технические навыки...");
-                responseMessage.setReplyMarkup(backButton());
+                sender.sendMessage(sender.fillTextMessage(chatId, "Мои технические навыки..."));
+            } else if (isMeeting(callbackData)) {
+                sender.deleteMessage(chatId, messageId);//"DATE_WEDNESDAY"
+                Meeting meeting = new Meeting();
+                meeting.setMeetingId(createMeetingId(chatId));
+                //DATE_TUESDAY_5
+                if (callbackData.contains(MEETING.name())) {
+                    meetingSender.fillMeetingButtons(chatId, callbackData);
+                } else if (callbackData.contains(DATE.name())) {
+                    meetingService.fillDayOfWeekAndMonth(meeting, user, callbackData); // заполняем meeting днем недели и датой
 
-                sender.sendMessage(responseMessage);
-            } else if (callbackData.equals(String.valueOf(MENU_BUTTON))) {
+                    Set<String> occupiedSlots =
+                            meetingService.getOccupiedTimeSlots(meeting.getDayOfWeek(), meeting.getDayOfMonth());
+
+                    meetingSender.fillTimeButtons(chatId, callbackData, occupiedSlots); // отправляем кнопки с выбором времени
+
+                } else if (callbackData.contains(TIME.name())) {//there
+                    meetingService.fillTime(user, callbackData); // заполняем meeting временем. после заполнения ничего не делаем!!!
+
+                    meetingSender.confirmationOfTheMeeting(user);//подтверждение встречи
+                } else if (callbackData.contains(APPROVE.name())) {
+                    meetingService.isActualMeeting(Long.valueOf(chatId), true);
+                    mainMenu(chatId);
+                }
+
+            } else if (callbackData.equals(String.valueOf(MENU))) {
                 sender.deleteMessage(chatId, messageId);
 
                 mainMenu(chatId);
@@ -70,31 +107,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    /**
-     * Метод создает кнопку у сообщения, для возврата в меню
-     * @return InlineKeyboardMarkup
-     */
-    private InlineKeyboardMarkup backButton() {
-        InlineKeyboardButton backButton = new InlineKeyboardButton();
-        backButton.setText("Вернуться в главное меню");
-        backButton.setCallbackData(String.valueOf(MENU_BUTTON));
-
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        row.add(backButton);
-        rows.add(row);
-        keyboardMarkup.setKeyboard(rows);
-
-        return keyboardMarkup;
-    }
 
     /**
      * Метод отвечает за главное меню
      * @param chatId
      */
     private void mainMenu(String chatId) {
-        InlineKeyboardMarkup markup = getInlineKeyboardMarkup();
+        InlineKeyboardMarkup markup = getMainMenu();
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -108,10 +127,11 @@ public class TelegramBot extends TelegramLongPollingBot {
      * Метод собирает клавиатуру для главного меню
      * @return markup
      */
-    private static InlineKeyboardMarkup getInlineKeyboardMarkup() {
+    private static InlineKeyboardMarkup getMainMenu() {
         InlineKeyboardMarkup markup  = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInlineOne = new ArrayList<>();
 
         rowInline.add(createButtonMenu("Мой опыт работы",
                 String.valueOf(WORK_EXPERIENCE)));
@@ -121,22 +141,15 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         rowsInline.add(rowInline);
 
+        rowInlineOne.add(createButtonMenu("Записаться на встречу",
+                String.valueOf(MEETING)));
+
+        rowsInline.add(rowInlineOne);
+
         markup.setKeyboard(rowsInline);
         return markup;
     }
 
-    /**
-     * Метод отвечает за создание кнопок для меню
-     * @param text - текст который будет выведен на кнопке
-     * @param callbackData - для идентификации ботом нужных команд
-     * @return button
-     */
-    private static InlineKeyboardButton createButtonMenu(String text, String callbackData) {
-        InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(text);
-        button.setCallbackData(callbackData);
-        return button;
-    }
 
     @Override
     public String getBotUsername() {

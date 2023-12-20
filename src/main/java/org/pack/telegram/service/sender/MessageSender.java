@@ -13,6 +13,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
 
+import static org.pack.telegram.enums.MeetingEnum.PREV_WEEK;
+import static org.pack.telegram.enums.MenuButtonsEnum.MEETING;
+import static org.pack.telegram.service.ButtonService.backButton;
+import static org.pack.telegram.service.CalendarService.getCalendar;
+
 /**
  * Класс отвечает за отправку сообщений в бот
  */
@@ -56,15 +61,13 @@ public class MessageSender {
         lastMessageIds.put(String.valueOf(sendMessage.getChatId()), sendMessage.getMessageId());
     }
 
-    public void sendTextMessage(String chatId, String text) {
+
+    public SendMessage fillTextMessage(String chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
-        try {
-            bot.execute(message);
-        } catch (TelegramApiException exception) {
-            log.error("Error send text message to telegram : {}", exception.getMessage());
-        }
+        message.setReplyMarkup(backButton());
+        return message;
     }
 
 }
