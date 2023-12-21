@@ -6,7 +6,8 @@ public enum MeetingEnum {
     TIME,
     PREV_WEEK,
     NEXT_WEEK,
-    APPROVE;
+    APPROVE,
+    DECLINE;
 
     public static boolean isMeeting(String field) {
         return field.contains(MEETING.name()) ||
@@ -14,7 +15,8 @@ public enum MeetingEnum {
                 field.contains(TIME.name()) ||
                 field.contains(PREV_WEEK.name()) ||
                 field.contains(NEXT_WEEK.name()) ||
-                field.contains(APPROVE.name());
+                field.contains(APPROVE.name()) ||
+                field.contains(DECLINE.name());
     }
 
 

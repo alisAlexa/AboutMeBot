@@ -29,6 +29,8 @@ public class MeetingService {
         this.repository = repository;
     }
 
+
+
     public void fillDayOfWeekAndMonth(Meeting meeting, User user, String callbackData) {
         meeting.setChatId(user.getChatId());
         meeting.setDayOfWeek(extractDayOfWeek(callbackData));

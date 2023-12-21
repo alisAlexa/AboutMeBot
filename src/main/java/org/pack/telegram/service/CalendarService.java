@@ -8,11 +8,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.pack.telegram.enums.MeetingEnum.*;
 import static org.pack.telegram.service.ButtonService.getBackButton;
+import static org.pack.telegram.util.CalendarUtils.*;
+import static org.pack.telegram.util.StringExtractor.capitalizeFirstLetter;
 
 @Component
 public class CalendarService {
@@ -37,17 +41,20 @@ public class CalendarService {
         for (LocalDate day : weekdays) {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(day.getDayOfWeek().toString() + " " + day.getDayOfMonth());//выдается как MONDAY 4
-            button.setCallbackData(DATE.name() + "_" + day.getDayOfWeek().toString() + "_" + day.getDayOfMonth() + "_" + day.getMonth().toString());
+
+            String dayOfWeekText = capitalizeFirstLetter(day.format(DAY_OF_WEEK_FORMATTER)); // "Понедельник"
+            String dayOfMonthText = day.format(DAY_OF_MONTH_FORMATTER); // "4"
+            String monthText = capitalizeFirstLetter(day.format(MONTH_FORMATTER)); // "Апреля"
+
+            button.setText(String.format("%s %s %s", dayOfWeekText, dayOfMonthText, monthText)); // "Понедельник 4 Апреля"
+            button.setCallbackData(String.format("DATE_%s_%s_%s", dayOfWeekText.toUpperCase(), dayOfMonthText, monthText.toUpperCase()));
 
             rowInline.add(button);
             rowsInline.add(rowInline);
         }
 
-        // Добавляем кнопки для переключения недель
+        // Добавляем кнопки для переключения недель и возврата в меню
         rowsInline.add(createWeekSwitchButtons());
-
-        //Вернуться в меню
         rowsInline.add(getBackButton());
 
         markup.setKeyboard(rowsInline);

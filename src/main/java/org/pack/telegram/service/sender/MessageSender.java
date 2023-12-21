@@ -1,4 +1,4 @@
-package org.pack.telegram.service;
+package org.pack.telegram.service.sender;
 
 import org.pack.telegram.TelegramBot;
 import org.slf4j.Logger;
@@ -13,10 +13,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
 
-import static org.pack.telegram.enums.MeetingEnum.PREV_WEEK;
-import static org.pack.telegram.enums.MenuButtonsEnum.MEETING;
-import static org.pack.telegram.service.ButtonService.backButton;
-import static org.pack.telegram.service.CalendarService.getCalendar;
+import static org.pack.telegram.service.ButtonService.backButtonKeyboard;
 
 /**
  * Класс отвечает за отправку сообщений в бот
@@ -66,7 +63,7 @@ public class MessageSender {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
-        message.setReplyMarkup(backButton());
+        message.setReplyMarkup(backButtonKeyboard());
         return message;
     }
 
