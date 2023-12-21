@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -35,6 +38,9 @@ public class Meeting {
     private boolean isActual;
 
     public String getMeeting() {
-        return " " + time + " " + dayOfMonth + " " + month + " (" + dayOfWeek + ") ";
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = time.format(timeFormatter);
+
+        return " ⏰ " + formattedTime + " 📅 " + dayOfMonth + " " + month + " (" + dayOfWeek + ")";
     }
 }

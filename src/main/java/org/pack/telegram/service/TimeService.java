@@ -15,8 +15,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static org.pack.telegram.service.ButtonService.getBackButton;
-import static org.pack.telegram.service.ButtonService.getBackToCalendarButton;
+import static org.pack.telegram.enums.MeetingEnum.DECLINE;
+import static org.pack.telegram.service.ButtonService.*;
+import static org.pack.telegram.service.KeyboardService.declineButtonInline;
 
 @Component
 public class TimeService {
@@ -56,7 +57,7 @@ public class TimeService {
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 
         rowsInline.add(getBackToCalendarButton());
-        rowsInline.add(getBackButton());
+        rowsInline.add(declineButtonInline());
 
         markup.setKeyboard(rowsInline);
         return markup;
